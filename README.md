@@ -120,4 +120,69 @@ class SampleQuotesSpider(scrapy.Spider):
     def parse(self, response):
         print(response.text)
 ```
+
+### Example for POST request
+
+```shell
+mukthy@ubuntu:~$ zyte-api-convertor '{
+
+    "url": "https://example.com",
+    "httpResponseBody": true,
+    "httpRequestMethod": "POST",
+    "httpRequestBody": "WyJCV0kiLCAiRkxMIl0=",
+    "customHttpRequestHeaders": 
+
+[
+
+        {
+            "name": "Content-Type",
+            "value": "application/json"
+        }
+    ]
+
+}'
+```
+
+### Output
+```python
+import scrapy
+
+
+class SampleQuotesSpider(scrapy.Spider):
+    name = "sample_zyte_api"
+
+    custom_settings = {
+        "DOWNLOAD_HANDLERS": {
+            "http": "scrapy_zyte_api.ScrapyZyteAPIDownloadHandler",
+            "https": "scrapy_zyte_api.ScrapyZyteAPIDownloadHandler",
+        },
+        "DOWNLOADER_MIDDLEWARES": {
+            "scrapy_zyte_api.ScrapyZyteAPIDownloaderMiddleware": 1000
+        },
+        "REQUEST_FINGERPRINTER_CLASS": "scrapy_zyte_api.ScrapyZyteAPIRequestFingerprinter",
+        "TWISTED_REACTOR": "twisted.internet.asyncioreactor.AsyncioSelectorReactor",
+        "ZYTE_API_KEY": "YOUR-API-KEY",
+    }
+
+    def start_requests(self):
+        yield scrapy.Request(
+            url="https://example.com",
+            meta={
+                "zyte_api": {
+                    "customHttpRequestHeaders": [
+                        {"name": "Content-Type", "value": "application/json"}
+                    ],
+                    "geolocation": "US",
+                    "httpResponseBody": True,
+                    "httpResponseHeaders": True,
+                    "experimental": {"responseCookies": False},
+                    "httpRequestMethod": "POST",
+                    "httpRequestBody": "WyJCV0kiLCAiRkxMIl0=",
+                }
+            },
+        )
+
+    def parse(self, response):
+        print(response.text)
+```
 Please note that the `ZYTE_API_KEY` is not set in the `custom_settings` of the spider. You need to set it before running it.
