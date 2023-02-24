@@ -4,10 +4,25 @@ import sys
 
 
 def payload_to_zyte(spider_name):
-    data = sys.argv[1]
-    data = data.replace(',}', '}')
-    data = data.replace(',]', ']')
-    data = json.loads(data)
+    
+    if os.name != 'nt':
+        data = sys.argv[1]
+        # print(data)
+        data = data.replace(',}', '}')
+        data = data.replace(',]', ']')
+        data = json.loads(data)
+        # print(data)
+
+    else:
+        print("Windows Detected!, Please enter the payload again.")
+        data = input("Enter the JSON Payload with quotes (only): ")
+        # print(data)
+        data = data.replace(',}', '}')
+        data = data.replace(',]', ']')
+        data = data.replace("'{", "{")
+        data = data.replace("}'", "}")
+        data = json.loads(data)
+        # print(data)
 
     url = data['url']
     if 'actions' in data:
@@ -320,6 +335,11 @@ def main():
             except IndexError:
                 print("Please provide a spider name.")
                 return
+
+        elif len(args) < 1:
+            print("Please provide a payload, Payload is Must. Use --help for more info")
+            return
+
 
         else:
             spider_name = "sample_zyte_api"
